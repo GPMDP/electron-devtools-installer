@@ -16,7 +16,11 @@ if (fs.existsSync(getIDMapPath())) {
   }
 }
 
-const install = (extensionReference, forceDownload = false) => {
+const install = (
+  extensionReference,
+  forceDownload = false,
+  electronSession = session.defaultSession,
+) => {
   if (process.type !== 'browser') {
     return Promise.reject(
       new Error('electron-devtools-installer can only be used from the main process'),
@@ -51,10 +55,10 @@ const install = (extensionReference, forceDownload = false) => {
   let extensionInstalled = extensionName;
 
   // For Electron >=9.
-  if (session.defaultSession.getExtension) {
+  if (electronSession.getExtension) {
     extensionInstalled =
       extensionInstalled &&
-      session.defaultSession.getAllExtensions().find((e) => e.name === extensionName);
+      electronSession.getAllExtensions().find((e) => e.name === extensionName);
   } else {
     extensionInstalled =
       extensionInstalled &&
@@ -69,17 +73,17 @@ const install = (extensionReference, forceDownload = false) => {
     // Use forceDownload, but already installed
     if (extensionInstalled) {
       // For Electron >=9.
-      if (session.defaultSession.removeExtension) {
-        const extensionId = session.defaultSession.getAllExtensions().find((e) => e.name).id;
-        session.defaultSession.removeExtension(extensionId);
+      if (electronSession.removeExtension) {
+        const extensionId = electronSession.getAllExtensions().find((e) => e.name).id;
+        electronSession.removeExtension(extensionId);
       } else {
         BrowserWindow.removeDevToolsExtension(extensionName);
       }
     }
 
     // For Electron >=9.
-    if (session.defaultSession.loadExtension) {
-      return session.defaultSession.loadExtension(extensionFolder).then((ext) => {
+    if (electronSession.loadExtension) {
+      return electronSession.loadExtension(extensionFolder).then((ext) => {
         return Promise.resolve(ext.name);
       });
     }
