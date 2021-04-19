@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "description": "An easy way to install Dev Tools extensions into Electron applications",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prettier:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "prettier:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
