@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as semver from 'semver';
 
 import downloadChromeExtension from './downloadChromeExtension';
-import { getPath } from './utils';
+import { getPath, removeUnrecognizedInfo } from './utils';
 
 let IDMap: Record<string, string> = {};
 const getIDMapPath = () => path.resolve(getPath(), 'IDMap.json');
@@ -119,6 +119,7 @@ const install = (
 
     // For Electron >=9.
     if ((session.defaultSession as any).loadExtension) {
+      removeUnrecognizedInfo(extensionFolder);
       return (session.defaultSession as any)
         .loadExtension(extensionFolder, loadExtensionOptions)
         .then((ext: { name: string }) => {

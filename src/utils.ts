@@ -2,6 +2,7 @@ import { app, net } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
+import * as rimraf from 'rimraf';
 
 export const getPath = () => {
   const savePath = app.getPath('userData');
@@ -36,4 +37,33 @@ export const changePermissions = (dir: string, mode: string | number) => {
       changePermissions(filePath, mode);
     }
   });
+};
+
+export const removeUnrecognizedInfo = (extensionDir: string) => {
+  // fix: Cannot load extension with file or directory name _metadata. Filenames starting with "_" are reserved for use by the system.
+  rimraf.sync(path.join(extensionDir, '_metadata'));
+
+  const manifestFilepath = path.join(extensionDir, 'manifest.json');
+
+  const manifestFileContent = JSON.parse(
+    fs.readFileSync(manifestFilepath, {
+      encoding: 'utf8',
+    }),
+  );
+
+  // fix: Unrecognized manifest key 'minimum_chrome_version' etc.
+  const removeFields = [
+    'minimum_chrome_version',
+    'browser_action',
+    'update_url',
+    'homepage_url',
+    'page_action',
+    'short_name',
+  ];
+
+  for (const field of removeFields) {
+    delete manifestFileContent[field];
+  }
+
+  fs.writeFileSync(manifestFilepath, JSON.stringify(manifestFileContent, null, 2));
 };
