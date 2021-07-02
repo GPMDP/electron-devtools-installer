@@ -33,7 +33,7 @@ const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-d
 const { app } = require('electron');
 
 app.whenReady().then(() => {
-    installExtension(REDUX_DEVTOOLS)
+    installExtension(REDUX_DEVTOOLS, { loadExtensionOptions: { allowFileAccess: true } })
         .then((name) => console.log(`Added Extension:  ${name}`))
         .catch((err) => console.log('An error occurred: ', err));
 });
